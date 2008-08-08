@@ -21,6 +21,7 @@ module MultiDb
         slaves.each {|slave| slave.send :include, MultiDb::ActiveRecordExtensions}
         ActiveRecord::Observer.send :include, MultiDb::ObserverExtensions
         ActiveRecord::Base.active_connections[master.name] = new(master, slaves)
+        RAILS_DEFAULT_LOGGER.info("** multi_db with master and #{slaves.length} slave#{"s" if slaves.length > 1} loaded.")
       end
 
       # Slave entries in the database.yml must be named like this
@@ -42,6 +43,7 @@ module MultiDb
                 end
               }, __FILE__, __LINE__
               slaves << "MultiDb::#{$1.camelize}".constantize
+              RAILS_DEFAULT_LOGGER.info("** multi_db slave '#{name}' connected.")
             end
           end
         end
